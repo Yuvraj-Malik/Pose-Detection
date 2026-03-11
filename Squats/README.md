@@ -1,84 +1,58 @@
-# Squat Detection & Scoring with Pose Estimation
+# Squat Detection and Scoring
 
-This project uses **TensorFlow MoveNet** (a pose estimation model) and **OpenCV** to detect squats in real-time from a webcam feed.  
-It tracks **hip–knee–ankle joint angles** to detect squat depth, count repetitions, and assign a **score based on form**.
+This project uses TensorFlow MoveNet (TFLite) and OpenCV to detect squats from a webcam feed in real time.
+It estimates body keypoints, computes knee angles, counts repetitions, and scores form quality.
 
----
+## Project Files
 
-## ⚙️ How it works
+- `Squats.ipynb`: Main notebook with full squat logic.
+- `3.tflite`: MoveNet model file used by the notebook.
+- `Requirements.txt`: Python dependencies.
 
-1. **Pose Detection**
+## How It Works
 
-   - Uses MoveNet (`.tflite` model) to extract 17 keypoints (shoulders, hips, knees, ankles, etc.) from webcam frames.
+1. Pose detection
+- MoveNet extracts 17 body keypoints from each frame.
 
-2. **Angle Calculation**
+2. Angle calculation
+- Knee angles are computed from hip-knee-ankle points.
 
-   - Calculates angles at both knees using hip, knee, and ankle coordinates.
+3. Rep detection
+- A rep is detected when movement transitions from squat-down to standing-up.
 
-3. **Rep Detection**
+4. Scoring
+- Depth around 85 to 115 degrees gives 100 points.
+- Near-good depth gives 90 points.
+- Acceptable but less ideal depth gives 75 points.
+- Too shallow or too deep gives 50 points.
 
-   - A rep is counted when the user moves from **down position (80°–130°)** back to **up position (>150°)**.
+5. Visual feedback
+- Skeleton color reflects form state.
+- Live rep count and latest score are overlaid on the video frame.
 
-4. **Scoring Logic**
+## Setup
 
-   - Perfect squat depth (85°–115°): **100 pts**
-   - Good depth (80°–85° or 115°–130°): **90 pts**
-   - Acceptable but not ideal (70°–80° or 130°–140°): **75 pts**
-   - Too shallow/deep (<70° or >140°): **50 pts**
-
-5. **Visual Feedback**
-   - Skeleton is drawn in **green** during correct form, otherwise in red.
-   - Live **counter** and **last rep score** are displayed on screen.
-
----
-
-## 🚀 Setup & Run
-
-### 1. Clone / Download the Project
-
-```bash
-git clone <your-repo-link>
-```
-
-### 2. Install Python
-
-Make sure you have **Python 3.8+** installed.  
-Check using:
+1. Install Python 3.8 or newer.
+2. Open a terminal in this folder.
+3. Install dependencies:
 
 ```bash
-python --version
+pip install -r Requirements.txt
 ```
 
-### 3. Download MoveNet Model
+## Run
 
-Download MoveNet Lightning (TFLite) from TensorFlow Hub:  
-👉 [MoveNet Lightning TFLite model](https://tfhub.dev/google/lite-model/movenet/singlepose/lightning/tflite/float16/4)
+1. Open `Squats.ipynb` in Jupyter (VS Code notebook works well).
+2. Run cells from top to bottom.
+3. Start the main loop cell to begin webcam detection.
+4. Press `q` in the video window to stop.
 
-Place the downloaded file in your project folder and extract it in the same location as of Jupyter Notebook:
+## Notes
 
-```
-3.tflite
-```
+- Use a well-lit area and keep your full body in frame.
+- Ensure `3.tflite` is in the same folder as the notebook.
+- Tune angle thresholds in the notebook if needed for your setup.
 
-### 4. Run the Program
+## Tech Stack
 
-```bash
-use shift + enter to run each tab and run the main logic tab in the end
-```
-
-Your webcam will open and start detecting squats in real-time.  
-Press **q** to exit.
-
----
-
-## 📌 Notes
-
-- Works best with a well-lit environment and the full body visible.
-- Thresholds can be tuned inside `squats.ipynb`:
-  - **Down position** → `80°–130°`
-  - **Up position** → `150°–180°`
-- Scoring system is customizable by editing the ranges in the code.
-
----
-
-👨‍💻 Built with **Python, TensorFlow, OpenCV, NumPy**
+Python, TensorFlow Lite, OpenCV, NumPy

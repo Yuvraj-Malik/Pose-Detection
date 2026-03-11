@@ -1,86 +1,59 @@
-# High Knees Detection & Scoring with Pose Estimation
+# High Knees Detection and Scoring
 
-This project uses **TensorFlow MoveNet** (a pose estimation model) and **OpenCV** to detect high knees in real-time from a webcam feed.  
-It tracks **hip–knee–ankle joint angles** to detect repetitions, count each leg individually, and assign a **score based on form**.
+This project uses TensorFlow MoveNet (TFLite) and OpenCV to detect high knees from a webcam feed in real time.
+It estimates body keypoints, computes knee angles, counts reps, and assigns a score based on movement quality.
 
----
+## Project Files
 
-## ⚙️ How it works
+- `High_Knees.ipynb`: Main notebook with the full pipeline.
+- `3.tflite`: MoveNet model file used by the notebook.
+- `Requirements.txt`: Python dependencies.
 
-1. **Pose Detection**
+## How It Works
 
-   - Uses MoveNet (`.tflite` model) to extract 17 keypoints (shoulders, hips, knees, ankles, etc.) from webcam frames.
+1. Pose detection
+- MoveNet extracts 17 body keypoints from each webcam frame.
 
-2. **Angle Calculation**
+2. Angle calculation
+- The notebook computes hip-knee-ankle angles for both legs.
+- A short smoothing buffer is used to reduce noise.
 
-   - Calculates angles at both knees using hip, knee, and ankle coordinates.
-   - Smooths the angles using a short buffer for stability.
+3. Rep detection
+- Each leg is tracked independently with up/down state transitions.
+- Total rep count increases by 0.5 per leg transition.
 
-3. **Rep Detection**
+4. Scoring
+- Knee close to hip and knee angle < 90 gives 100 points.
+- Slightly lower knee or angle < 120 gives 80 points.
+- Otherwise, score is 60 points.
 
-   - A rep for each leg is counted when the knee is lifted above the hip (UP condition) and returned to neutral (DOWN condition).
-   - Counts are **incremented 0.5 per leg** to get total reps.
+5. Visual feedback
+- Skeleton color indicates form quality.
+- Live rep counter and latest score are shown on the video frame.
 
-4. **Scoring Logic**
+## Setup
 
-   - Knee height close to hip and angle < 90°: **100 pts**
-   - Knee slightly lower or angle < 120°: **80 pts**
-   - Otherwise (less height or angle > 120°): **60 pts**
-
-5. **Visual Feedback**
-   - Skeleton is drawn in **green** during correct form, otherwise in red.
-   - Live **counter** and **last rep score** are displayed on screen.
-
----
-
-## 🚀 Setup & Run
-
-### 1. Clone / Download the Project
-
-```bash
-git clone <your-repo-link>
-cd high-knees-detector
-```
-
-### 2. Install Python
-
-Make sure you have **Python 3.8+** installed.  
-Check using:
+1. Install Python 3.8 or newer.
+2. Open a terminal in this folder.
+3. Install dependencies:
 
 ```bash
-python --version
+pip install -r Requirements.txt
 ```
 
-### 3. Download MoveNet Model
+## Run
 
-Download MoveNet Lightning (TFLite) from TensorFlow Hub:  
-👉 [MoveNet Lightning TFLite model](https://tfhub.dev/google/lite-model/movenet/singlepose/lightning/tflite/float16/4)
+1. Open `High_Knees.ipynb` in Jupyter (VS Code notebook works well).
+2. Run cells from top to bottom.
+3. When the main loop cell starts, webcam detection begins.
+4. Press `q` in the video window to stop.
 
-Place the downloaded file in your project folder and rename it:
+## Notes
 
-```
-3.tflite
-```
+- Use a well-lit area and keep your full body visible.
+- Ensure `3.tflite` is in the same folder as the notebook.
+- You can tune thresholds in the notebook for your camera angle and range of motion.
 
-### 4. Run the Program
+## Tech Stack
 
-```bash
-use shift + enter to run each tab and run the main logic tab in the end
-```
-
-Your webcam will open and start detecting high knees in real-time.  
-Press **q** to exit.
-
----
-
-## 📌 Notes
-
-- Works best in a well-lit environment with the full body visible.
-- Thresholds can be tuned inside `high_knees_detector.py`:
-  - **UP condition** → Knee above hip, angle < 100°
-  - **DOWN condition** → Angle > 160°
-- Scoring system is customizable by editing the ranges in the code.
-
----
-
-👨‍💻 Built with **Python, TensorFlow, OpenCV, NumPy**
+Python, TensorFlow Lite, OpenCV, NumPy
